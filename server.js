@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectDatabase from './db/connectDatabase.js';
 import freelancerRoutes from './Routes/FreeliencerRoute.js'
+import clientRoutes from './Routes/ClientRoutes.js'
 import path from 'path'; // Import path to work with file and directory paths
 import { fileURLToPath } from 'url';  // Import the fileURLToPath method
 
@@ -47,6 +48,7 @@ app.get("/", (req, res) => {
 
 // Get the directory name for the current file (equivalent of __dirname in CommonJS)
 app.use('/api/freelancers', freelancerRoutes);
+app.use('/api/client', clientRoutes);
 
 
 // Middleware to parse JSON bodies

@@ -9,6 +9,7 @@ const clientSchema = new Schema(
     email: { type: String, lowercase: true, unique: true },
     mobile: { type: String, },
     password: { type: String, }, // ⚠️ Hash in production
+    confirmPassword: { type: String, }, // ⚠️ Hash in production
     companyName: { type: String },
     profileImage: { type: String }, // URL or file path
     address: {

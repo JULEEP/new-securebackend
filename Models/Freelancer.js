@@ -5,9 +5,9 @@ const { Schema } = mongoose;
 
 const freelancerSchema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, },
     gender: { type: String },
-    email: { type: String, lowercase: true, required: true, unique: true },
+    email: { type: String, lowercase: true, unique: true },
     mobile: { type: String },
     profileImage: { type: String }, // Path to the uploaded profile image
     skills: [{ type: String }], // Array of skill strings
