@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Client from '../Models/Client.js';
+import Proposal from '../Models/Proposal.js';
 
 // Client Registration
 export const registerClient = async (req, res) => {
@@ -113,3 +114,22 @@ export const getAllClients = async (req, res) => {
     });
   }
 };
+
+
+export const getProposalsByClient = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+
+    const proposals = await Proposal.find({ clientId }).sort({ createdAt: -1 });
+
+    if (!proposals.length) {
+      return res.status(404).json({ message: 'No proposals found for this client' });
+    }
+
+    res.status(200).json(proposals);
+  } catch (error) {
+    console.error('Error fetching client proposals:', error);
+    res.status(500).json({ message: 'Server error while fetching proposals' });
+  }
+};
+

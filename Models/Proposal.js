@@ -2,25 +2,37 @@ import mongoose from 'mongoose';
 
 const proposalSchema = new mongoose.Schema(
   {
-    clientId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Client'
-    },
-    projectId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Project'
-    },
-    overview: { type: String },
-    scopeOfWork: { type: String },
-    startTime: { type: Date },
-    endTime: { type: Date },
-    totalAmount: { type: Number },
-    termsAndConditions: { type: String },
+    title: { type: String },
     status: {
       type: String,
       enum: ['Pending', 'Accepted', 'Rejected'],
       default: 'Pending'
-    }
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Client'
+    },
+    freelancerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Freelancer'
+    },
+    client: {
+      name: { type: String },
+      company: { type: String },
+      email: { type: String },
+      phone: { type: String },
+      date: { type: Date }
+    },
+    overview: { type: String },
+    scopeOfWork: [{ type: String }],
+    timeline: {
+      start: { type: Date },
+      end: { type: Date }
+    },
+    total: { type: Number },
+    termsAndConditions: [{ type: String }],
+    actions: [{ type: String }],
+    footerButtons: [{ type: String }]
   },
   {
     timestamps: true

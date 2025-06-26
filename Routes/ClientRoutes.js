@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerClient, loginClient, getAllClients } from '../Controller/ClientController.js';
+import { registerClient, loginClient, getAllClients, getProposalsByClient } from '../Controller/ClientController.js';
 
 const router = express.Router();
 
@@ -11,5 +11,6 @@ router.post('/register', registerClient);
 // @desc    Login client
 router.post('/login', loginClient);
 router.get('/getallclients', getAllClients);
+router.get('/getallproposal/:clientId', getProposalsByClient);
 
 export default router;

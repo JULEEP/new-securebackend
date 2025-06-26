@@ -565,62 +565,21 @@ export const deleteTeamMember = async (req, res) => {
   
 
 
-export const createProposal = async (req, res) => {
-  const {
-    clientId,
-    projectId,
-    overview,
-    scopeOfWork,
-    startTime,
-    endTime,
-    totalAmount,
-    termsAndConditions,
-    status
-  } = req.body;
-
-
-  try {
-    const newProposal = new Proposal({
-      clientId,
-      projectId,
-      overview,
-      scopeOfWork,
-      startTime,
-      endTime,
-      totalAmount,
-      termsAndConditions,
-      status: status || 'Pending'
-    });
-
-    const savedProposal = await newProposal.save();
-
-    return res.status(201).json({
-      message: 'Proposal created successfully',
-      proposal: savedProposal
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error while creating proposal' });
-  }
-};
-
 
 export const getAllProposals = async (req, res) => {
-  const { freelancerId } = req.params;
+   try {
+    const { freelancerId } = req.params;
 
-  try {
-    const proposals = await Proposal.find()
-      .populate('clientId', 'name email')
-      .populate('projectId', 'title description');
+    const proposals = await Proposal.find({ freelancerId }).sort({ createdAt: -1 });
 
-    return res.status(200).json({
-      message: 'Proposals fetched successfully',
-      proposals,
-      viewedBy: freelancerId
-    });
+    if (!proposals.length) {
+      return res.status(404).json({ message: 'No proposals found for this freelancer' });
+    }
+
+    res.status(200).json(proposals);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error fetching proposals' });
+    console.error('Error fetching freelancer proposals:', error);
+    res.status(500).json({ message: 'Server error while fetching proposals' });
   }
 };
 
@@ -648,5 +607,45 @@ export const getProposalById = async (req, res) => {
   }
 };
 
+
+
+export const createProposal = async (req, res) => {
+  try {
+    const { freelancerId } = req.params;
+    const {
+      clientId,
+      title,
+      client,
+      overview,
+      scopeOfWork,
+      timeline,
+      total,
+      termsAndConditions,
+      actions,
+      footerButtons
+    } = req.body;
+
+    const newProposal = new Proposal({
+      freelancerId,
+      clientId,
+      title,
+      status: 'Pending', // default
+      client,
+      overview,
+      scopeOfWork,
+      timeline,
+      total,
+      termsAndConditions,
+      actions,
+      footerButtons
+    });
+
+    const savedProposal = await newProposal.save();
+    res.status(201).json(savedProposal);
+  } catch (error) {
+    console.error('Error creating proposal:', error);
+    res.status(500).json({ message: 'Failed to create proposal' });
+  }
+};
 
 
