@@ -120,7 +120,12 @@ export const getProposalsByClient = async (req, res) => {
   try {
     const { clientId } = req.params;
 
-    const proposals = await Proposal.find({ clientId }).sort({ createdAt: -1 });
+    const proposals = await Proposal.find({ clientId })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'freelancerId',
+        select: 'name email mobile location' // Select only required fields
+      });
 
     if (!proposals.length) {
       return res.status(404).json({ message: 'No proposals found for this client' });
