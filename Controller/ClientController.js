@@ -124,17 +124,21 @@ export const getProposalsByClient = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate({
         path: 'freelancerId',
-        select: 'name email mobile location' // Select only required fields
+        select: 'name email mobile location'
       });
 
     if (!proposals.length) {
       return res.status(404).json({ message: 'No proposals found for this client' });
     }
 
-    res.status(200).json(proposals);
+    res.status(200).json({
+      message: 'Proposals fetched successfully',
+      data: proposals
+    });
   } catch (error) {
     console.error('Error fetching client proposals:', error);
     res.status(500).json({ message: 'Server error while fetching proposals' });
   }
 };
+
 
