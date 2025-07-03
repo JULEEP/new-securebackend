@@ -19,6 +19,26 @@ const freelancerSchema = new Schema(
     portfolioLinks: [{ type: String }],
     termsAndConditionsAgreed: { type: Boolean },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the User
+      myClients: [
+      {
+        clientId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Client', // Assuming you have a Client model
+        },
+        name: {
+          type: String,
+        },
+        company: {
+          type: String,
+        },
+        email: {
+          type: String,
+        },
+        phone: {
+          type: String,
+        }
+      }
+    ],
   },
   {
     timestamps: true, // createdAt and updatedAt

@@ -16,6 +16,7 @@ import { createClient,
     loginFreelancer, 
     registerFreelancer, 
     updateClient, 
+    getFreelancerClients,
     updateTeamMember } from '../Controller/FreeliencerController.js';
 
 const router = express.Router();
@@ -45,6 +46,8 @@ router.get('/getprojects/:freelancerId', getProjectsByFreelancer);
 router.post('/create-proposals/:freelancerId', createProposal);
 router.get('/allproposals/:freelancerId', getAllProposals);
 router.get('/singleproposals/:freelancerId/:proposalId', getProposalById);
+router.get('/myclients/:freelancerId', getFreelancerClients);
+
 
 
 

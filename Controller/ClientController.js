@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import Client from '../Models/Client.js';
 import Proposal from '../Models/Proposal.js';
+import Freelancer from '../Models/Freelancer.js';
+
 
 // Client Registration
 export const registerClient = async (req, res) => {
@@ -141,4 +143,75 @@ export const getProposalsByClient = async (req, res) => {
   }
 };
 
+
+// Update Proposal Status by Proposal ID and Client ID
+export const updateProposalStatus = async (req, res) => {
+  try {
+    const { clientId, proposalId } = req.params; // Extract clientId and proposalId from params
+    const { status } = req.body; // Get the status from the request body
+
+    // Validate the status against the enum options
+    const validStatuses = ['Pending', 'Accepted', 'Rejected'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status provided. Valid statuses are: Pending, Accepted, Rejected' });
+    }
+
+    // Find the proposal by clientId and proposalId
+    const proposal = await Proposal.findOne({ _id: proposalId, clientId });
+
+    if (!proposal) {
+      return res.status(404).json({ message: 'Proposal not found or client not authorized' });
+    }
+
+    // If the status is "Accepted", update the freelancer's myClients array
+    if (status === 'Accepted') {
+      // Fetch the freelancer's data
+      const freelancer = await Freelancer.findById(proposal.freelancerId);
+
+      if (!freelancer) {
+        return res.status(404).json({ message: 'Freelancer not found' });
+      }
+
+      // Prepare the client data to push into freelancer's `myClients` array
+      const clientData = {
+        clientId,
+        name: proposal.clientName, // Assuming `clientName` is part of the proposal document, modify if necessary
+        company: proposal.clientCompany, // Assuming `clientCompany` is part of the proposal document, modify if necessary
+        email: proposal.clientEmail, // Assuming `clientEmail` is part of the proposal document, modify if necessary
+        phone: proposal.clientPhone // Assuming `clientPhone` is part of the proposal document, modify if necessary
+      };
+
+      // Push the client data into the freelancer's `myClients` array if it's not already there
+      if (!freelancer.myClients.some(client => client.clientId.toString() === clientData.clientId.toString())) {
+        freelancer.myClients.push(clientData);
+        await freelancer.save();
+      }
+    }
+
+    // If the status is "Rejected", remove the client data from freelancer's `myClients` array
+    if (status === 'Rejected') {
+      const freelancer = await Freelancer.findById(proposal.freelancerId);
+
+      if (!freelancer) {
+        return res.status(404).json({ message: 'Freelancer not found' });
+      }
+
+      // Remove the client data from the freelancer's `myClients` array
+      freelancer.myClients = freelancer.myClients.filter(client => client.clientId.toString() !== clientId.toString());
+      await freelancer.save();
+    }
+
+    // Update the proposal status
+    proposal.status = status;
+    await proposal.save();
+
+    res.status(200).json({
+      message: `Proposal status updated to ${status} successfully`,
+      data: proposal
+    });
+  } catch (error) {
+    console.error('Error updating proposal status:', error);
+    res.status(500).json({ message: 'Server error while updating proposal status' });
+  }
+};
 

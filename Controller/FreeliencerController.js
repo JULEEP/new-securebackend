@@ -649,3 +649,39 @@ export const createProposal = async (req, res) => {
 };
 
 
+// Get Freelancer's clients with details
+export const getFreelancerClients = async (req, res) => {
+  try {
+    const { freelancerId } = req.params; // Extract freelancerId from params
+
+    // Find the freelancer by ID and populate the myClients array
+    const freelancer = await Freelancer.findById(freelancerId)
+      .populate({
+        path: 'myClients.clientId', // Populate the clientId field
+        select: 'name email mobile' // Select the required fields from the Client model
+      });
+
+    if (!freelancer) {
+      return res.status(404).json({ message: 'Freelancer not found' });
+    }
+
+    // Format the myClients data to return the necessary client information
+    const clientDetails = freelancer.myClients.map(client => ({
+      clientId: client.clientId._id,
+      name: client.clientId.name,
+      email: client.clientId.email,
+      phone: client.clientId.mobile
+    }));
+
+    res.status(200).json({
+      message: 'Freelancer clients fetched successfully',
+      data: clientDetails
+    });
+  } catch (error) {
+    console.error('Error fetching freelancer clients:', error);
+    res.status(500).json({ message: 'Server error while fetching freelancer clients' });
+  }
+};
+
+
+
