@@ -683,5 +683,22 @@ export const getFreelancerClients = async (req, res) => {
   }
 };
 
+export const getAllProjects = async (req, res) => {
+  try {
+    const { freelancerId } = req.params;
+
+    // Fetch proposals with 'Accepted' status and sort by creation date
+    const proposals = await Proposal.find({ freelancerId, status: 'Accepted' }).sort({ createdAt: -1 });
+
+    if (!proposals.length) {
+      return res.status(404).json({ message: 'No accepted proposals found for this freelancer' });
+    }
+
+    res.status(200).json(proposals);
+  } catch (error) {
+    console.error('Error fetching freelancer proposals:', error);
+    res.status(500).json({ message: 'Server error while fetching proposals' });
+  }
+};
 
 

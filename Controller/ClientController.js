@@ -215,3 +215,32 @@ export const updateProposalStatus = async (req, res) => {
   }
 };
 
+
+
+export const getMyProjects = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+
+    // Fetch only accepted proposals (projects) for the client and populate freelancer details
+    const proposals = await Proposal.find({ clientId, status: 'Accepted' })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'freelancerId',
+        select: 'name email mobile location'
+      });
+
+    if (!proposals.length) {
+      return res.status(404).json({ message: 'No accepted projects found for this client' });
+    }
+
+    res.status(200).json({
+      message: 'Accepted projects fetched successfully',
+      data: proposals
+    });
+  } catch (error) {
+    console.error('Error fetching client projects:', error);
+    res.status(500).json({ message: 'Server error while fetching projects' });
+  }
+};
+
+
