@@ -39,6 +39,56 @@ const freelancerSchema = new Schema(
         }
       }
     ],
+      name: { type: String },
+  position: { type: String },
+  experience: { type: String },
+  location: { type: String },
+  linkedin: { type: String },
+  github: { type: String },
+  twitter: { type: String },
+  profileImage: { type: String },
+
+  // Simple Arrays
+  skills: [{ type: String }],
+  services: [{ type: String }],
+
+  // Testimonials as array of objects
+  testimonials: [
+    {
+      name: { type: String },
+      position: { type: String },
+      opinion: { type: String },
+    },
+  ],
+
+  // About Section
+  about: {
+    heading: { type: String },
+    description: { type: String },
+    image: { type: String },
+    mission: { type: String },
+    vision: { type: String },
+    experienceYears: { type: String },
+    completedProjects: { type: String },
+    happyClients: { type: String },
+    teamMembers: { type: String },
+  },
+
+  // FAQs
+  faq: [
+    {
+      question: { type: String },
+      answer: { type: String },
+    },
+  ],
+
+  // Latest Work
+  latestWork: [
+    {
+      image: { type: String },
+      link: { type: String },
+    },
+  ],
   },
   {
     timestamps: true, // createdAt and updatedAt

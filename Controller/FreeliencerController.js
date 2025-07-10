@@ -107,30 +107,104 @@ export const loginFreelancer = async (req, res) => {
 
   
   export const getFreelancer = async (req, res) => {
-    try {
-      const freelancerId = req.params.freelancerId;
-  
-      const freelancer = await Freelancer.findById(freelancerId);
-  
-      if (!freelancer) {
-        return res.status(404).json({ message: 'Freelancer not found!' });
-      }
-  
-      return res.status(200).json({
-        message: 'Freelancer details retrieved successfully!',
-        id: freelancer._id,
-        name: freelancer.name,
-        email: freelancer.email,
-        mobile: freelancer.mobile,
-        skills: freelancer.skills || [],
-        location: freelancer.location || null,
-        profileImage: freelancer.profileImage || 'default-profile-image.jpg',
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Server error' });
+  try {
+    const freelancerId = req.params.freelancerId;
+
+    const freelancer = await Freelancer.findById(freelancerId);
+
+    if (!freelancer) {
+      return res.status(404).json({ message: 'Freelancer not found!' });
     }
-  };
+
+    return res.status(200).json({
+      message: 'Freelancer details retrieved successfully!',
+      id: freelancer._id,
+      name: freelancer.name || "",
+      position: freelancer.position || "",
+      experience: freelancer.experience || "",
+      email: freelancer.email || "",
+      mobile: freelancer.mobile || "",
+      location: freelancer.location || "",
+      linkedin: freelancer.linkedin || "",
+      github: freelancer.github || "",
+      twitter: freelancer.twitter || "",
+      profileImage: freelancer.profileImage || "default-profile-image.jpg",
+      skills: freelancer.skills || [],
+      services: freelancer.services || [],
+      testimonials: freelancer.testimonials || [],
+      about: freelancer.about || {},
+      faq: freelancer.faq || [],
+      latestWork: freelancer.latestWork || [],
+      createdAt: freelancer.createdAt,
+      updatedAt: freelancer.updatedAt
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+  export const updateFreelancer = async (req, res) => {
+  try {
+    const freelancerId = req.params.freelancerId;
+
+    const freelancer = await Freelancer.findById(freelancerId);
+
+    if (!freelancer) {
+      return res.status(404).json({ message: 'Freelancer not found!' });
+    }
+
+    // Update all fields from req.body
+    const {
+      name,
+      position,
+      experience,
+      location,
+      linkedin,
+      github,
+      twitter,
+      profileImage,
+
+      skills,
+      services,
+      testimonials,
+      about,
+      faq,
+      latestWork,
+    } = req.body;
+
+    // Basic fields
+    if (name) freelancer.name = name;
+    if (position) freelancer.position = position;
+    if (experience) freelancer.experience = experience;
+    if (location) freelancer.location = location;
+    if (linkedin) freelancer.linkedin = linkedin;
+    if (github) freelancer.github = github;
+    if (twitter) freelancer.twitter = twitter;
+    if (profileImage) freelancer.profileImage = profileImage;
+
+    // Arrays or nested objects
+    if (skills) freelancer.skills = skills;
+    if (services) freelancer.services = services;
+    if (testimonials) freelancer.testimonials = testimonials;
+    if (about) freelancer.about = about;
+    if (faq) freelancer.faq = faq;
+    if (latestWork) freelancer.latestWork = latestWork;
+
+    await freelancer.save();
+
+    return res.status(200).json({
+      message: 'Freelancer profile updated successfully!',
+      freelancer,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
   
 
 
