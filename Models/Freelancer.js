@@ -89,6 +89,10 @@ const freelancerSchema = new Schema(
       link: { type: String },
     },
   ],
+   myInvoices: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Invoice'
+  }],
     profileImage: {
     type: String,
     default: '', // Optional

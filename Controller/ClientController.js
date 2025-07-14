@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import Client from '../Models/Client.js';
 import Proposal from '../Models/Proposal.js';
 import Freelancer from '../Models/Freelancer.js';
+import Invoice from '../Models/Invoice.js';
 
 
 // Client Registration
@@ -268,3 +269,32 @@ export const getMyProjects = async (req, res) => {
 };
 
 
+
+export const getInvoicesByClient = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+
+    const invoices = await Invoice.find({ clientId })
+      .populate({
+        path: 'clientId',
+        select: 'name email mobile address'
+      })
+      .populate({
+        path: 'freelancerId',
+        select: 'name email mobile'
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: invoices.length,
+      invoices
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching invoices for client',
+      error: error.message
+    });
+  }
+};

@@ -24,6 +24,10 @@ const clientSchema = new Schema(
   type: mongoose.Schema.Types.ObjectId,
   ref: 'Project'
 }],
+myInvoices: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Invoice'
+  }],
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   {

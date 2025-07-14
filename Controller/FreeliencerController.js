@@ -4,6 +4,7 @@ import Client from '../Models/Client.js';
 import Project from '../Models/Project.js';
 import TeamMember from '../Models/TeamMember.js';
 import Proposal from '../Models/Proposal.js';
+import Invoice from '../Models/Invoice.js';
 
 export const registerFreelancer = async (req, res) => {
   try {
@@ -786,3 +787,95 @@ export const getAllProjects = async (req, res) => {
 };
 
 
+
+export const createInvoice = async (req, res) => {
+  try {
+    const { freelancerId, clientId } = req.params;
+    const {
+      invoiceNumber,
+      invoiceDate,
+      items,
+      taxRate,
+      paymentMethod,
+      terms
+    } = req.body;
+
+    // Calculate totals
+    const subTotal = items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+    const taxAmount = (taxRate / 100) * subTotal;
+    const grandTotal = subTotal + taxAmount;
+
+    // Create the invoice
+    const invoice = new Invoice({
+      freelancerId,
+      clientId,
+      invoiceNumber,
+      invoiceDate,
+      items: items.map(item => ({
+        ...item,
+        total: item.quantity * item.price
+      })),
+      subTotal,
+      taxRate,
+      taxAmount,
+      grandTotal,
+      paymentMethod,
+      terms
+    });
+
+    await invoice.save();
+
+    // Push invoice ID to freelancer and client models
+    await Promise.all([
+      Freelancer.findByIdAndUpdate(freelancerId, {
+        $push: { myInvoices: invoice._id }
+      }),
+      Client.findByIdAndUpdate(clientId, {
+        $push: { myInvoices: invoice._id }
+      })
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: 'Invoice created and linked to Freelancer & Client successfully',
+      invoice
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating invoice',
+      error: error.message
+    });
+  }
+};
+
+
+
+export const getInvoicesByFreelancer = async (req, res) => {
+  try {
+    const { freelancerId } = req.params;
+
+    const invoices = await Invoice.find({ freelancerId })
+      .populate({
+        path: 'clientId',
+        select: 'name email mobile address'
+      })
+      .populate({
+        path: 'freelancerId',
+        select: 'name email mobile'
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: invoices.length,
+      invoices
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching invoices for freelancer',
+      error: error.message
+    });
+  }
+};
