@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 
 
 // ✅ Serve static files from /uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use(cors({
     origin: ['http://localhost:3000'],

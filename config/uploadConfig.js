@@ -1,32 +1,30 @@
-// config/uploadConfig.js
+// config/uploadProfileImg.js
 import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-// Multer Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads'); // Folder where files will be saved
+    cb(null, './uploads/profileImg'); // Store in profileImg folder
   },
   filename: (req, file, cb) => {
-    cb(null, uuidv4() + path.extname(file.originalname)); // Unique filename
+    cb(null, uuidv4() + path.extname(file.originalname)); // Unique file name
   }
 });
 
-// Multer configuration
-const uploads = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+const uploadProfileImg = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|gif|mp4|mov/;
+    const filetypes = /jpeg|jpg|png/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Only images and videos are allowed!'));
+      cb(new Error('Only image files are allowed (jpg, jpeg, png).'));
     }
   }
-}).array('file', 10); // Replaced 'media' with 'file', allows up to 10 files
+}).single('profileImage'); // Accept one file named profileImage
 
-export default uploads;
+export default uploadProfileImg;

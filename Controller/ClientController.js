@@ -144,6 +144,30 @@ export const getProposalsByClient = async (req, res) => {
 };
 
 
+export const getSingleProposalByClient = async (req, res) => {
+  try {
+    const { clientId, proposalId } = req.params;
+
+    const proposal = await Proposal.findOne({ _id: proposalId, clientId })
+      .populate({
+        path: 'freelancerId',
+        select: 'name email mobile location'
+      });
+
+    if (!proposal) {
+      return res.status(404).json({ message: 'Proposal not found for this client' });
+    }
+
+    res.status(200).json({
+      message: 'Proposal fetched successfully',
+      data: proposal
+    });
+  } catch (error) {
+    console.error('Error fetching single client proposal:', error);
+    res.status(500).json({ message: 'Server error while fetching proposal' });
+  }
+};
+
 // Update Proposal Status by Proposal ID and Client ID
 export const updateProposalStatus = async (req, res) => {
   try {

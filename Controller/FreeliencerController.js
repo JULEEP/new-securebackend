@@ -146,7 +146,7 @@ export const loginFreelancer = async (req, res) => {
 
 
 
-  export const updateFreelancer = async (req, res) => {
+ export const updateFreelancer = async (req, res) => {
   try {
     const freelancerId = req.params.freelancerId;
 
@@ -156,7 +156,7 @@ export const loginFreelancer = async (req, res) => {
       return res.status(404).json({ message: 'Freelancer not found!' });
     }
 
-    // Update all fields from req.body
+    // Text fields
     const {
       name,
       position,
@@ -165,8 +165,6 @@ export const loginFreelancer = async (req, res) => {
       linkedin,
       github,
       twitter,
-      profileImage,
-
       skills,
       services,
       testimonials,
@@ -175,7 +173,7 @@ export const loginFreelancer = async (req, res) => {
       latestWork,
     } = req.body;
 
-    // Basic fields
+    // Update fields
     if (name) freelancer.name = name;
     if (position) freelancer.position = position;
     if (experience) freelancer.experience = experience;
@@ -183,9 +181,12 @@ export const loginFreelancer = async (req, res) => {
     if (linkedin) freelancer.linkedin = linkedin;
     if (github) freelancer.github = github;
     if (twitter) freelancer.twitter = twitter;
-    if (profileImage) freelancer.profileImage = profileImage;
 
-    // Arrays or nested objects
+    // Update profileImage if file is uploaded
+    if (req.file) {
+      freelancer.profileImage = `/uploads/profileImg/${req.file.filename}`;
+    }
+
     if (skills) freelancer.skills = skills;
     if (services) freelancer.services = services;
     if (testimonials) freelancer.testimonials = testimonials;
@@ -204,6 +205,7 @@ export const loginFreelancer = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
 
   
 
@@ -422,21 +424,29 @@ export const createClient = async (req, res) => {
   
   // ✅ Get All Clients (by a Freelancer)
   export const getClientsByFreelancer = async (req, res) => {
-    const { freelancerId } = req.params;
-  
-    try {
-      const clients = await Client.find(); // You can filter if needed
-  
-      res.status(200).json({
-        message: 'Clients fetched successfully',
-        clients,
-        viewedBy: freelancerId,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error fetching clients' });
+  const { freelancerId } = req.params;
+
+  try {
+    const freelancer = await Freelancer.findById(freelancerId);
+
+    if (!freelancer) {
+      return res.status(404).json({ message: 'Freelancer not found' });
     }
-  };
+
+    const clientIds = freelancer.myClients.map((entry) => entry.clientId);
+
+    const clients = await Client.find({ _id: { $in: clientIds } });
+
+    res.status(200).json({
+      message: 'Clients fetched successfully',
+      clients,
+      viewedBy: freelancerId,
+    });
+  } catch (error) {
+    console.error('Error fetching freelancer clients:', error);
+    res.status(500).json({ message: 'Error fetching clients' });
+  }
+};
   
   // ✅ Get Single Client
   export const getSingleClient = async (req, res) => {

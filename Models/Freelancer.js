@@ -89,6 +89,10 @@ const freelancerSchema = new Schema(
       link: { type: String },
     },
   ],
+    profileImage: {
+    type: String,
+    default: '', // Optional
+  },
   },
   {
     timestamps: true, // createdAt and updatedAt
