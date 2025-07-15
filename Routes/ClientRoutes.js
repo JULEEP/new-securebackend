@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerClient, loginClient, getAllClients, getProposalsByClient, updateProposalStatus, getMyProjects, getSingleProposalByClient, getInvoicesByClient } from '../Controller/ClientController.js';
+import { registerClient, loginClient, getAllClients, getProposalsByClient, updateProposalStatus, getMyProjects, getSingleProposalByClient, getInvoicesByClient, getSingleProject, deleteSingleProject } from '../Controller/ClientController.js';
 
 const router = express.Router();
 
@@ -14,6 +14,8 @@ router.get('/getallclients', getAllClients);
 router.get('/getallproposal/:clientId', getProposalsByClient);
 router.get('/singleproposal/:clientId/:proposalId', getSingleProposalByClient);
 router.get('/getallprojects/:clientId', getMyProjects);
+router.get('/my-project/:clientId/:proposalId', getSingleProject);
+router.delete('/delete-project/:clientId/:proposalId', deleteSingleProject);
 router.put('/update-proposal/:clientId/:proposalId', updateProposalStatus);
 
 //invoices

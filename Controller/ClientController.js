@@ -270,6 +270,62 @@ export const getMyProjects = async (req, res) => {
 
 
 
+export const getSingleProject = async (req, res) => {
+  try {
+    const { clientId, proposalId } = req.params;
+
+    const proposal = await Proposal.findOne({
+      _id: proposalId,
+      clientId,
+      status: 'Accepted'
+    }).populate({
+      path: 'freelancerId',
+      select: 'name email mobile location'
+    });
+
+    if (!proposal) {
+      return res.status(404).json({ message: 'Accepted project not found for this client' });
+    }
+
+    res.status(200).json({
+      message: 'Accepted project fetched successfully',
+      data: proposal
+    });
+  } catch (error) {
+    console.error('Error fetching single client project:', error);
+    res.status(500).json({ message: 'Server error while fetching the project' });
+  }
+};
+
+
+
+export const deleteSingleProject = async (req, res) => {
+  try {
+    const { clientId, proposalId } = req.params;
+
+    const deletedProposal = await Proposal.findOneAndDelete({
+      _id: proposalId,
+      clientId,
+      status: 'Accepted' // only delete if it's accepted
+    });
+
+    if (!deletedProposal) {
+      return res.status(404).json({ message: 'Accepted project not found or already deleted' });
+    }
+
+    res.status(200).json({
+      message: 'Accepted project deleted successfully',
+      deletedProposal
+    });
+  } catch (error) {
+    console.error('Error deleting client project:', error);
+    res.status(500).json({ message: 'Server error while deleting the project' });
+  }
+};
+
+
+
+
 export const getInvoicesByClient = async (req, res) => {
   try {
     const { clientId } = req.params;

@@ -21,7 +21,11 @@ import { createClient,
     getAllProjects,
     updateFreelancer,
     createInvoice,
-    getInvoicesByFreelancer} from '../Controller/FreeliencerController.js';
+    getInvoicesByFreelancer,
+    updateProject,
+    updateProposal,
+    deleteProposal,
+    deleteProject} from '../Controller/FreeliencerController.js';
     import uploadProfileImg from '../config/uploadConfig.js';
 
 const router = express.Router();
@@ -45,11 +49,15 @@ router.put('/updateteam/:freelancerId/:memberId', updateTeamMember);
 router.delete('/deleteteam/:freelancerId/:memberId', deleteTeamMember);
 //projects
 router.post('/createproject/:freelancerId', createProject);
+router.put('/updateproject/:freelancerId/:projectId', updateProject);
+router.delete('/deleteproject/:freelancerId/:projectId', deleteProject);
 router.get('/getprojects/:freelancerId', getProjectsByFreelancer);
 
 
 //proposal
 router.post('/create-proposals/:freelancerId', createProposal);
+router.put('/updateproposal/:freelancerId/:proposalId', updateProposal);
+router.delete('/deleteproposal/:freelancerId/:proposalId', deleteProposal);
 router.get('/allproposals/:freelancerId', getAllProposals);
 router.get('/allprojects/:freelancerId', getAllProjects);
 router.get('/singleproposals/:freelancerId/:proposalId', getProposalById);

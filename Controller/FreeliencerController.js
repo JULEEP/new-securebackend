@@ -378,6 +378,47 @@ export const loginFreelancer = async (req, res) => {
   };
 
 
+
+export const deleteProject = async (req, res) => {
+  const { freelancerId, projectId } = req.params;
+
+  try {
+    const project = await Project.findOne({
+      _id: projectId,
+      assignedFreelancer: freelancerId
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found or not assigned to this freelancer' });
+    }
+
+    // Remove the project from all assigned team members
+    if (project.assignedTo && project.assignedTo.length > 0) {
+      await TeamMember.updateMany(
+        { _id: { $in: project.assignedTo } },
+        { $pull: { assignedProjects: projectId } }
+      );
+    }
+
+    // Optionally, remove from client's `myProjects` too (if required)
+    if (project.clientId) {
+      await Client.findByIdAndUpdate(project.clientId, {
+        $pull: { myProjects: project._id }
+      });
+    }
+
+    // Delete the project
+    await Project.findByIdAndDelete(projectId);
+
+    res.status(200).json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    res.status(500).json({ message: 'Server error while deleting project' });
+  }
+};
+
+
+
 // ✅ Create Client
 export const createClient = async (req, res) => {
     const { freelancerId } = req.params;
@@ -732,6 +773,58 @@ export const createProposal = async (req, res) => {
     res.status(500).json({ message: 'Failed to create proposal' });
   }
 };
+
+
+export const updateProposal = async (req, res) => {
+  const { freelancerId, proposalId } = req.params;
+  const updateFields = req.body;
+
+  try {
+    const updatedProposal = await Proposal.findOneAndUpdate(
+      { _id: proposalId, freelancerId },
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!updatedProposal) {
+      return res.status(404).json({ message: 'Proposal not found or not owned by this freelancer' });
+    }
+
+    return res.status(200).json({
+      message: 'Proposal updated successfully',
+      proposal: updatedProposal,
+    });
+  } catch (error) {
+    console.error('Error updating proposal:', error);
+    res.status(500).json({ message: 'Failed to update proposal' });
+  }
+};
+
+
+
+export const deleteProposal = async (req, res) => {
+  const { freelancerId, proposalId } = req.params;
+
+  try {
+    const deletedProposal = await Proposal.findOneAndDelete({
+      _id: proposalId,
+      freelancerId
+    });
+
+    if (!deletedProposal) {
+      return res.status(404).json({ message: 'Proposal not found or not owned by this freelancer' });
+    }
+
+    return res.status(200).json({
+      message: 'Proposal deleted successfully',
+      proposal: deletedProposal,
+    });
+  } catch (error) {
+    console.error('Error deleting proposal:', error);
+    res.status(500).json({ message: 'Failed to delete proposal' });
+  }
+};
+
 
 
 // Get Freelancer's clients with details
